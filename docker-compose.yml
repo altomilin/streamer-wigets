@@ -10,7 +10,6 @@ networks:
 services:
   web:
     build: .
-    command: gunicorn wigets.wsgi --reload -b 0.0.0.0:8000
     restart: unless-stopped
     depends_on:
       - db
@@ -20,7 +19,7 @@ services:
     networks:
       - db_net
     ports:
-    - 8001:8000
+    - 8000:8000
     env_file:
       - .env
   db:
@@ -43,10 +42,13 @@ services:
       - .env
   nginx:
     build: ./nginx
+    restart: unless-stopped
     volumes:
     - static_volume:/src/staticfiles
+    networks:
+      - db_net
     ports:
-    - 1337:80
+    - 80:80
     depends_on:
       - web
 
