@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Widjet</title>
+    <style>
+        .widget {
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            display: inline-block;
+            padding: 20px;
+            background: rgba(19, 15, 15, 0.25);
+            border-radius: 50px;
+            vertical-align: center;
+        }
+        .counter {
+            padding: 0;
+            list-style-type: none;
+        }
+        .counter_item {
+            text-shadow: #ffffff 0px 0 10px;
+            list-style-type: none;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            font-size: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="widget">
+        <ul>
+            {% for counter in widget_data.counters.all %}
+                <li class="counter_item">{{ counter.label }}: {{ counter.value }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
