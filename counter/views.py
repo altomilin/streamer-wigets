@@ -17,6 +17,20 @@ class CounterViewSet(ModelViewSet):
     queryset = Counter.objects.all()
     serializer_class = CounterSerializer
 
+    @action(methods=['post'], detail=True, url_path='increase')
+    def increase_value(self, request, *args, **kwargs):
+        counter = self.get_object()
+        counter.value += request.data.get('increase_value', counter.default_increment)
+        counter.save()
+        return HttpResponse(counter)
+
+    @action(methods=['post'], detail=True, url_path='decrease')
+    def increase_value(self, request, *args, **kwargs):
+        counter = self.get_object()
+        counter.value -= request.data.get('decrease_value', counter.default_increment)
+        counter.save()
+        return HttpResponse(counter)
+
 
 class WidgetCounterViewSet(ModelViewSet):
     queryset = WidgetCounter.objects.all()

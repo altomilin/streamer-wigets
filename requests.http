@@ -1,0 +1,26 @@
+POST http://localhost/counter/counters/1/increase/
+Content-Type: application/json
+
+{
+  "increase_value": 10
+}
+
+###
+
+POST http://localhost:8000/counter/counters/1/increase/
+Content-Type: application/json
+
+{
+  "increase_value": 10
+}
+
+###
+
+POST http://localhost:8000/counter/counters/1/decrease/
+Content-Type: application/json
+
+{
+  "decrease_value": 10
+}
+
+###
