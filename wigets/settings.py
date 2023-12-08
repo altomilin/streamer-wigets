@@ -45,9 +45,8 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-
-
     'counter.apps.CounterConfig',
+    'frontend.apps.FrontendConfig',
 ]
 
 MIDDLEWARE = [
