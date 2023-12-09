@@ -1,0 +1,48 @@
+{% extends 'frontend/base.html' %}
+
+{% block content %}
+
+    <div class="row text-center justify-content-center">
+        <div class="col-sm-12 col-md-8 col-lg-4" style="max-width:400px;">
+            <h1 class="h3 mt-5 mb-3">Регистрация</h1>
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="input-group mt-2">
+                    {{ form.username }}
+                </div>
+                <div class="input-group mt-2">
+                    {{ form.email }}
+                </div>
+                <div class="input-group mt-2">
+                    {{ form.password1 }}
+                </div>
+                <div class="input-group mt-2">
+                    {{ form.password2 }}
+                </div>
+
+
+
+                <input type="submit" class="mt-2" value="Создать пользователя">
+            </form>
+            <div class="mt-1">
+                <span >Уже есть аккаунт?</span>
+                <a href="{% url 'login' %}">Войти</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        		//Query All input fields
+		let form_fields = document.getElementsByTagName('input')
+		form_fields[1].placeholder='Логин';
+		form_fields[2].placeholder='Email';
+		form_fields[3].placeholder='Пароль';
+		form_fields[4].placeholder='Подтверждение пароля';
+
+
+		for (let field in form_fields){
+			form_fields[field].className += ' form-control'
+		}
+    </script>
+
+{% endblock %}

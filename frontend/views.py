@@ -1,4 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+
+from frontend.forms import RegisterForm
+
 
 def index(request):
     context = {
@@ -7,7 +10,7 @@ def index(request):
     return render(request, 'frontend/base.html', context)
 
 
-def login(request):
+def login_page(request):
     context = {
         'title': 'Вход'
     }
@@ -19,4 +22,16 @@ def logout(request):
 
 
 def register(request):
-    pass
+    form = RegisterForm()
+
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+
+    context = {
+        "form": form,
+        "title": "Регистрация",
+    }
+    return render(request, 'frontend/register.html', context)
