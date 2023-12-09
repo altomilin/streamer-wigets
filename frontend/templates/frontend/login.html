@@ -5,18 +5,17 @@
         <div class="col-sm-12 col-md-8 col-lg-4" style="max-width:400px;">
             <h1 class="mt-5 h3">Авторизация</h1>
             <p class="mb-3">Введите логин и пароль</p>
+            {% for massage in messages %}
+            <div class="alert alert-secondary" role="alert">
+               <p>{{ massage }}</p>
+            </div>
+            {% endfor %}
             <form action="" method="POST">
                 {% csrf_token %}
                 <label class="visually-hidden" for="login">login</label>
-                <input type="text" id="login" class="form-control mt-1" placeholder="Логин" required autofocus>
+                <input type="text" name="username" id="login" class="form-control mt-1" placeholder="Логин" required autofocus>
                 <label for="password" class="visually-hidden"></label>
-                <input type="password" id="password" class="form-control mt-1" placeholder="Пароль" required>
-                <div class="checkbox mt-2 ps-2 text-start">
-                    <label >
-                        <input type="checkbox" value="remember-me">
-                        запомнить меня
-                    </label>
-                </div>
+                <input type="password" name="password" id="password" class="form-control mt-1" placeholder="Пароль" required>
                 <input type="submit" class="form-control mt-2" value="Войти">
             </form>
             <div class="mt-1">
