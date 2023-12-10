@@ -3,6 +3,7 @@ from frontend.forms import RegisterForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 
+from counter.models import WidgetCounter, Counter
 
 def index(request):
     context = {
@@ -55,7 +56,9 @@ def register(request):
 
 
 def widgets(request):
+    widgets_list = WidgetCounter.objects.filter(user=request.user)
     context = {
-        'title': 'Виджеты'
+        'title': 'Виджеты',
+        'widgets_list': widgets_list,
     }
-    return render(request, 'frontend/base.html', context)
+    return render(request, 'frontend/widgets.html', context)
