@@ -24,3 +24,10 @@ Content-Type: application/json
 }
 
 ###
+
+POST http://127.0.0.1:8000/api/v1/widgets/
+Content-Type: application/json
+
+{
+  "title": "test1"
+}

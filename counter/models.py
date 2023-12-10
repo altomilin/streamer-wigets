@@ -3,7 +3,7 @@ from django.db import models
 
 
 class WidgetCounter(models.Model):
-    uuid = models.CharField(max_length=10)
+    uuid = models.UUIDField()
     title = models.CharField(max_length=200, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 

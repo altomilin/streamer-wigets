@@ -2,14 +2,14 @@
 
 {% block content %}
 <div class="container">
-    <div class="row border border-3 rounded-3 mt-2">
+    <div class="row border border-3 rounded-3 mt-2 glass">
         <h1 class="h3 mt-2 mb-3">Добавление виджетов</h1>
         <div class="col col-sm-12 col-md-6">
-            <form action="" method="post">
+            <form action="" method="post" id="create-widget">
                 {% csrf_token %}
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="widget-name" id="widget-name-label">Имя виджета</label>
-                    <input type="text" class="form-control" id="widget-name" aria-describedby="widget-name-label">
+                    <input type="text" class="form-control" id="widget-name" name="title" aria-describedby="widget-name-label">
                 </div>
                 <div class="input-group mb-3">
                     <input type="submit" class="btn btn-outline-secondary" value="Добавить">
@@ -31,4 +31,57 @@
         {% endfor %}
     </div>
 </div>
+    <style>
+        .glass {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 0 32px 0 rgba(0, 0, 0, 0.37);
+        }
+    </style>
+    <script>
+    window.addEventListener("load", () => {
+        const form = document.getElementById("create-widget");
+
+        form.addEventListener("submit", (event) =>{
+            event.preventDefault();
+            const FD = new FormData(form);
+
+            const apiUrl = 'http://127.0.0.1:8000/api/v1/widgets/';
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+
+            // Sample data to be sent in the request body
+            const postData = {
+              title: FD.get('title'),
+            };
+
+            // Make a POST request
+            fetch(apiUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+                // You might need to include additional headers like authentication tokens
+              },
+              body: JSON.stringify(postData),
+            })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+              })
+              .then(data => {
+                // Process the data from the server
+                console.log(data);
+              })
+              .catch(error => {
+                // Handle errors
+                console.error('Error:', error);
+              });
+
+        })
+    });
+    </script>
 {% endblock %}
