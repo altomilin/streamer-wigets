@@ -1,32 +1,102 @@
 {% extends 'frontend/base.html' %}
 
 {% block content %}
-<div class="container">
-    <div class="col">
-        <h1 class="h3 text-center mt-3 mx-auto">{{ widget.title }}</h1>
-        {% for counter in widget.counters.all %}
-            <div class="row">
-                <div class="input-group mt-2 mb-2 mx-auto" style="max-width: 500px">
-                    <span class="input-group-text">{{ counter.label }}</span>
-                    <input type="text" class="form-control" value="{{ counter.value }}">
-                    <button class="btn btn-outline-secondary">Установить</button>
-                    <button class="btn btn-outline-secondary">-</button>
-                    <input type="text" class="form-control text-center" value="{{ counter.default_increment }}">
-                    <button class="btn btn-outline-secondary">+</button>
-                    <button class="btn btn-outline-secondary">-{{ counter.default_increment }}</button>
-                    <button class="btn btn-outline-secondary">+{{ counter.default_increment }}</button>
-
-
+    <div class="container">
+        <div class="col">
+            <h1 class="h3 text-center mt-3 mx-auto">{{ widget.title }}</h1>
+            {% for counter in widget.counters.all %}
+                <div class="row" data-counter-id="{{ counter.id }}" data-url="{% url 'counter-detail' pk=counter.id %}">
+                    <div class="input-group mt-2 mb-2 mx-auto" style="max-width: 500px">
+                        <span class="input-group-text">{{ counter.label }}</span>
+                        <input id="counter-{{ counter.id }}" name="value" type="number" class="form-control change-to" value="{{ counter.value }}">
+                        <button class="change-value btn btn-outline-secondary" data-action="set-value">Установить</button>
+                        <button class="change-value btn btn-outline-secondary" data-action="decrease-value">-</button>
+                        <input id="counter-change-{{ counter.id }}" name="change" type="number" class="form-control text-center " value="{{ counter.default_increment }}">
+                        <button class="change-value btn btn-outline-secondary" data-action="increase-value">+</button>
+                        <button class="change-value btn btn-outline-secondary" data-action="decrease-default-value" data-increment="{{ counter.default_increment }}">-{{ counter.default_increment }}</button>
+                        <button class="change-value btn btn-outline-secondary" data-action="increase-default-value" data-increment="{{ counter.default_increment }}">+{{ counter.default_increment }}</button>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
-</div>
+    <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const changeValueButtons = document.querySelectorAll('.change-value');
 
-    <div class="row">
-        <span></span>
-    </div>
-    <div class="row">
+        function changeValue(event) {
+            const counterId = event.target.closest('div[data-counter-id]').dataset.counterId;
 
-    </div>
+            let apiUrl = event.target.closest('div[data-counter-id]').dataset.url;
+            console.log(apiUrl);
+            const counterInput = document.getElementById('counter-' + counterId);
+            const type = event.target.dataset.action;
+            const defaultIncrement = event.target.dataset.increment;
+            const change = document.getElementById('counter-change-' + counterId);
+
+            const csrfToken = "{{ csrf_token }}";
+
+            let postData = {};
+
+            switch (type) {
+                case 'set-value':
+                    apiUrl += 'set-value/'
+                    postData['value'] = counterInput.value;
+                    break;
+                case 'increase-value':
+                    counterInput.value = +counterInput.value + +change.value;
+                    apiUrl += 'increase/'
+                    postData['increase-value'] = change.value;
+                    break;
+                case 'decrease-value':
+                    counterInput.value = +counterInput.value - +change.value;
+                    apiUrl += 'decrease/'
+                    postData['decrease-value'] = change.value;
+                    break;
+                case 'increase-default-value':
+                    counterInput.value = +counterInput.value + +defaultIncrement;
+                    apiUrl += 'increase/'
+                    postData['increase-value'] = defaultIncrement;
+                    break;
+                case 'decrease-default-value':
+                    counterInput.value = +counterInput.value - +defaultIncrement;
+                    apiUrl += 'decrease/'
+                    postData['decrease-value'] = defaultIncrement;
+                    break;
+            }
+
+            fetch(apiUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+              },
+              body: JSON.stringify(postData),
+            })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+              })
+              .then(data => {
+                // Process the data from the server
+                console.log(data);
+              })
+              .catch(error => {
+                // Handle errors
+                console.error('Error:', error);
+              });
+
+
+        }
+
+        changeValueButtons.forEach(function (button) {
+            button.addEventListener('click', function(event) {
+                changeValue(event);
+            });
+        });
+
+    });
+    </script>
 {% endblock %}

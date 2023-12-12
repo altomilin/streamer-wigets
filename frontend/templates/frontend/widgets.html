@@ -75,13 +75,10 @@
             const apiUrl = 'http://127.0.0.1:8000/api/v1/widgets/';
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-
-            // Sample data to be sent in the request body
             const postData = {
               title: FD.get('title'),
             };
 
-            // Make a POST request
             fetch(apiUrl, {
               method: 'POST',
               headers: {
