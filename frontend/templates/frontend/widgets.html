@@ -4,8 +4,8 @@
 <div class="container">
     <div class="row border border-3 rounded-3 mt-2 glass">
         <h1 class="h3 mt-2 mb-3">Добавление виджетов</h1>
-        <div class="col col-sm-12 col-md-6">
-            <form action="" method="post" id="create-widget">
+        <div class="col col-sm-12 col-md-6 col-lg-6">
+            <form method="post" id="create-widget">
                 {% csrf_token %}
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="widget-name" id="widget-name-label">Имя виджета</label>
@@ -16,20 +16,45 @@
                 </div>
             </form>
         </div>
-        <div class="col col-sm-12 col-md-6">
+        <div class="col col-sm-12 col-md-6 col-lg-6">
 
         </div>
     </div>
-    <div class="row">
-        {% for widget in widgets_list %}
-        <div class="col-sm12 col-md-6 col-lg-6">
-            {{ widget }}
-        </div>
-        <div class="col-sm12 col-md-6 col-lg-6">
 
-        </div>
-        {% endfor %}
+    {% for widget in widgets_list %}
+    <div class="row glass border border-3 rounded-3 mt-2" data-widget="{{ widget.id }}">
+            <div class="col-sm12 col-md-6 col-lg-6 border-end">
+                <div class="row mt-1 mb-1">
+                    <div class="col-9">
+                        <h2 class="h4 mt-2 d-inline">{{ widget.title }}</h2>
+                        <button class="btn btn-outline-info">Управление виджетом</button>
+                    </div>
+                    <div class="col-3 text-end">
+                        <button class="btn btn-danger" data-delete-widget="{{ widget.id }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <form method="POST" data-create-counter="{{ widget.id }}">
+                    {% csrf_token %}
+                    {% for counter in widget.counters.all %}
+                        <p>{{ counter }}</p>
+                    {% endfor %}
+                    <input type="text" class="form-control mb-1" placeholder="Имя счетчика">
+                    <input type="number" class="form-control mb-1" placeholder="Значение">
+                    <input type="number" class="form-control mb-1" placeholder="Изменение по умолчанию">
+                    <div class="row mx-auto">
+                        <input type="submit" class="btn btn-outline-secondary" value="Добавить счетчик" data-widget-id="{{ widget.id }}">
+                    </div>
+                </form>
+            </div>
+            <div class="col-sm12 col-md-6 col-lg-6">
+
+            </div>
     </div>
+    {% endfor %}
 </div>
     <style>
         .glass {
@@ -81,7 +106,34 @@
                 console.error('Error:', error);
               });
 
-        })
+        });
+
+        const countersForms = document.querySelectorAll('form[data-create-counter]');
+
+        const createCounter = function(event) {
+            event.preventDefault();
+
+            const formElement = event.currentTarget;
+            const widgetId = formElement.dataset.createCounter;
+            console.log(widgetId);
+        }
+
+        countersForms.forEach(function (form) {
+            form.addEventListener('submit', createCounter);
+        });
+
+        const deleteWidgetButtons = document.querySelectorAll('button[data-delete-widget]');
+
+        const deleteWidget = function (event) {
+            const formElement = event.currentTarget;
+            const widgetId = formElement.dataset.deleteWidget;
+            console.log(widgetId);
+        }
+
+        deleteWidgetButtons.forEach(function (button) {
+            button.addEventListener('click', deleteWidget);
+        });
+
     });
     </script>
 {% endblock %}
