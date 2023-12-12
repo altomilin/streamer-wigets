@@ -1,0 +1,32 @@
+{% extends 'frontend/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="col">
+        <h1 class="h3 text-center mt-3 mx-auto">{{ widget.title }}</h1>
+        {% for counter in widget.counters.all %}
+            <div class="row">
+                <div class="input-group mt-2 mb-2 mx-auto" style="max-width: 500px">
+                    <span class="input-group-text">{{ counter.label }}</span>
+                    <input type="text" class="form-control" value="{{ counter.value }}">
+                    <button class="btn btn-outline-secondary">Установить</button>
+                    <button class="btn btn-outline-secondary">-</button>
+                    <input type="text" class="form-control text-center" value="{{ counter.default_increment }}">
+                    <button class="btn btn-outline-secondary">+</button>
+                    <button class="btn btn-outline-secondary">-{{ counter.default_increment }}</button>
+                    <button class="btn btn-outline-secondary">+{{ counter.default_increment }}</button>
+
+
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+    <div class="row">
+        <span></span>
+    </div>
+    <div class="row">
+
+    </div>
+{% endblock %}

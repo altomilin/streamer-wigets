@@ -62,3 +62,13 @@ def widgets(request):
         'widgets_list': widgets_list,
     }
     return render(request, 'frontend/widgets.html', context)
+
+
+def widgets_detail(request, widget_uuid):
+    widget = WidgetCounter.objects.filter(user=request.user, uuid=widget_uuid)[0]
+
+    context = {
+        'widget': widget,
+    }
+    return render(request, 'frontend/widget.html', context)
+

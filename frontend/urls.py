@@ -8,4 +8,5 @@ urlpatterns = [
     path('logout/', views.logout_page, name='logout'),
     path('register/', views.register, name='register'),
     path('widgets', views.widgets, name='widgets'),
+    path('widgets_detail/<uuid:widget_uuid>', views.widgets_detail, name='widgets_detail'),
 ]

@@ -27,7 +27,7 @@
                 <div class="row mt-1 mb-1">
                     <div class="col-9">
                         <h2 class="h4 mt-2 d-inline">{{ widget.title }}</h2>
-                        <button class="btn btn-outline-info">Управление виджетом</button>
+                        <a class="btn btn-outline-info" href="/widgets_detail/{{ widget.uuid }}">Управление виджетом<a/>
                     </div>
                     <div class="col-3 text-end">
                         <button class="btn btn-danger" data-delete-widget="{{ widget.id }}">
