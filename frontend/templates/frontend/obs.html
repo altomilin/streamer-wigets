@@ -15,5 +15,34 @@
             </div>
         </div>
     {% endfor %}
+    <script>
+        const csrfToken = "{{ csrf_token }}";
+
+        function fetchApiData() {
+          fetch('{{ url }}', {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+              },
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log(data);
+              // Handle the data from the API
+            })
+            .catch(error => {
+              console.error('There has been a problem with your fetch operation:', error);
+            });
+        }
+
+        // Set interval to 5 seconds (5000 milliseconds)
+        setInterval(fetchApiData, 1000);
+    </script>
 </body>
 </html>

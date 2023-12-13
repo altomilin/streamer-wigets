@@ -1,9 +1,15 @@
 from django.shortcuts import render, redirect
+from rest_framework import status
+from rest_framework.response import Response
+
+from counter.serializers import WidgetCounterSerializer
 from frontend.forms import RegisterForm
 from django.contrib import messages
+from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 
 from counter.models import WidgetCounter, Counter
+
 
 def index(request):
     context = {
@@ -66,16 +72,29 @@ def widgets(request):
 
 def widgets_detail(request, widget_uuid):
     widget = WidgetCounter.objects.filter(user=request.user, uuid=widget_uuid)[0]
-
+    url = request.build_absolute_uri(reverse('widget_detail_obs', args=(widget.uuid, )))
     context = {
         'widget': widget,
+        'url': url,
     }
     return render(request, 'frontend/widget.html', context)
 
 
+def widget_data(request, widget_uuid):
+    widget = WidgetCounter.objects.filter(uuid=widget_uuid)[0]
+    serializer = WidgetCounterSerializer(instance=widget, many=True)
+    if serializer.is_valid():
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 def widget_detail_obs(request, widget_uuid):
     widget = WidgetCounter.objects.filter(uuid=widget_uuid)[0]
+    url = request.build_absolute_uri(reverse('widgetcounter-detail', args=(widget.id, )))
+
     context = {
         'counters': widget.counters.all(),
+        'url': url,
     }
     return render(request, 'frontend/obs.html', context)
