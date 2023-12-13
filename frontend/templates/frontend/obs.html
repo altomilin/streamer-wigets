@@ -11,7 +11,7 @@
         <div class="row">
             <div class="col">
                 <span class="fs-2 d-inline">{{ counter.label }}:</span>
-                <span class="fs-2 d-inline">{{ counter.value }}</span>
+                <span class="fs-2 d-inline" data-counter-id="{{ counter.id }}">{{ counter.value }}</span>
             </div>
         </div>
     {% endfor %}
@@ -33,8 +33,11 @@
               return response.json();
             })
             .then(data => {
-              console.log(data);
-              // Handle the data from the API
+                data.counters.forEach(counter => {
+                    var element = document.querySelector('[data-counter-id="' + counter.id + '"]');
+                    element.innerHTML = counter.value;
+                    console.log(counter.label, counter.value);
+                });
             })
             .catch(error => {
               console.error('There has been a problem with your fetch operation:', error);
@@ -42,7 +45,7 @@
         }
 
         // Set interval to 5 seconds (5000 milliseconds)
-        setInterval(fetchApiData, 1000);
+        setInterval(fetchApiData, 5000);
     </script>
 </body>
 </html>
