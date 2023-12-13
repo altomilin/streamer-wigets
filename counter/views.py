@@ -42,7 +42,7 @@ class CounterViewSet(ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=True, url_path='decrease')
-    def increase_value(self, request, *args, **kwargs):
+    def decrease_value(self, request, *args, **kwargs):
         counter = self.get_object()
         new_value = counter.value - int(request.data.get('decrease_value', counter.default_increment))
         serializer = CounterSerializer(counter, data={'value': new_value}, partial=True)

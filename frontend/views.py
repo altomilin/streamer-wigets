@@ -72,3 +72,10 @@ def widgets_detail(request, widget_uuid):
     }
     return render(request, 'frontend/widget.html', context)
 
+
+def widget_detail_obs(request, widget_uuid):
+    widget = WidgetCounter.objects.filter(uuid=widget_uuid)[0]
+    context = {
+        'counters': widget.counters.all(),
+    }
+    return render(request, 'frontend/obs.html', context)

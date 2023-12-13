@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>obs</title>
+    <link rel="stylesheet" href="{% static 'frontend/css/bootstrap.min.css' %}">
+</head>
+<body>
+    {% for counter in counters %}
+        <div class="row">
+            <div class="col">
+                <span class="fs-2 d-inline">{{ counter.label }}:</span>
+                <span class="fs-2 d-inline">{{ counter.value }}</span>
+            </div>
+        </div>
+    {% endfor %}
+</body>
+</html>

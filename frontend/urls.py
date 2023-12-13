@@ -9,4 +9,5 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('widgets', views.widgets, name='widgets'),
     path('widgets_detail/<uuid:widget_uuid>', views.widgets_detail, name='widgets_detail'),
+    path('counter/<uuid:widget_uuid>', views.widget_detail_obs, name='widget_detail_obs')
 ]
