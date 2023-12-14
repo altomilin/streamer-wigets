@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 # Create your views here.
@@ -9,6 +10,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from counter.serializers import CounterSerializer, WidgetCounterSerializer
 from counter.models import Counter, WidgetCounter
+from counter.permissions import IsOwnerOrReadOnly
 
 
 def index(request):
@@ -18,6 +20,7 @@ def index(request):
 class CounterViewSet(ModelViewSet):
     queryset = Counter.objects.all()
     serializer_class = CounterSerializer
+    permission_classes = [IsOwnerOrReadOnly]
 
     @action(methods=['post'], detail=True, url_path='set-value')
     def set_value(self, request, *args, **kwargs):
@@ -56,6 +59,7 @@ class CounterViewSet(ModelViewSet):
 class WidgetCounterViewSet(ModelViewSet):
     queryset = WidgetCounter.objects.all()
     serializer_class = WidgetCounterSerializer
+    permission_classes = [IsOwnerOrReadOnly]
 
     @action(methods=['get'], detail=True, url_path='counter-widget')
     def get_counter_widget(self, request, *args, **kwargs):

@@ -1,7 +1,7 @@
 {% extends 'frontend/base.html' %}
 
 {% block content %}
-<div class="container">
+<div class="container" id="main-container">
     <div class="row border border-3 rounded-3 mt-2 glass">
         <h1 class="h3 mt-2 mb-3">Добавление виджетов</h1>
         <div class="col col-sm-12 col-md-6 col-lg-6">
@@ -22,33 +22,42 @@
     </div>
 
     {% for widget in widgets_list %}
-    <div class="row glass border border-3 rounded-3 mt-2" data-widget="{{ widget.id }}">
-            <div class="col-sm12 col-md-6 col-lg-6 border-end">
+    <div class="widget-container row glass border border-3 rounded-3 mt-2" data-widget="{{ widget.id }}">
+            <div class="widget-container-left col-sm12 col-md-6 col-lg-6 border-end" data-widget-id="{{ widget.id }}">
                 <div class="row mt-1 mb-1">
-                    <div class="col-9">
-                        <h2 class="h4 mt-2 d-inline">{{ widget.title }}</h2>
-                        <a class="btn btn-outline-info" href="/widgets_detail/{{ widget.uuid }}">Управление виджетом<a/>
-                    </div>
-                    <div class="col-3 text-end">
-                        <button class="btn btn-danger" data-delete-widget="{{ widget.id }}">
+                    <div class="col">
+                        <span class="fs-4">{{ widget.title }}</span>
+                        <a class="btn btn-outline-info" href="{% url 'widgets_detail' widget_uuid=widget.uuid %}">Управление виджетом</a>
+                        <button class="widget-delete btn btn-danger" data-widget-id="{{ widget.id }}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
                                 <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
                             </svg>
                         </button>
                     </div>
                 </div>
-                <form method="POST" data-create-counter="{{ widget.id }}">
-                    {% csrf_token %}
-                    {% for counter in widget.counters.all %}
-                        <p>{{ counter }}</p>
-                    {% endfor %}
-                    <input type="text" class="form-control mb-1" placeholder="Имя счетчика">
-                    <input type="number" class="form-control mb-1" placeholder="Значение">
-                    <input type="number" class="form-control mb-1" placeholder="Изменение по умолчанию">
-                    <div class="row mx-auto">
-                        <input type="submit" class="btn btn-outline-secondary" value="Добавить счетчик" data-widget-id="{{ widget.id }}">
+                <div class="row mt-1 mb-1">
+                    <form class="col counter-add" data-widget-id="{{ widget.id }}">
+                        <input name="label" type="text" class="form-control mb-1" placeholder="Имя счетчика" required >
+                        <input name="value" type="number" class="form-control mb-1" placeholder="Значение" required >
+                        <input name="default" type="number" class="form-control mb-1" placeholder="Изменение по умолчанию" required >
+                        <div class="row mx-auto">
+                            <input type="submit" class="add-counter btn btn-outline-secondary" value="Добавить счетчик" data-widget-id="{{ widget.id }}">
+                        </div>
+                    </form>
+                </div>
+                {% for counter in widget.counters.all %}
+                <div class="row mt-2 mb-2 counter-container" data-counter-id="{{ counter.id }}">
+                    <div class="col">
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="{{ counter.label }}">
+                            <input type="text" class="form-control" value="{{ counter.value }}">
+                            <input type="text" class="form-control" value="{{ counter.default_increment }}">
+                            <button class="change-counter btn btn-outline-secondary input-group-btn" data-counter-id="{{ counter.id }}">Изменить</button>
+                            <button class="delete-counter btn btn-outline-danger input-group-btn" data-counter-id="{{ counter.id }}">Удалить</button>
+                        </div>
                     </div>
-                </form>
+                </div>
+                {% endfor %}
             </div>
             <div class="col-sm12 col-md-6 col-lg-6">
 
@@ -65,6 +74,162 @@
         }
     </style>
     <script>
+    const csrfToken = "{{ csrf_token }}";
+
+    const deleteWidget = function (event) {
+        const element = event.currentTarget;
+        const widgetId = element.dataset.widgetId;
+        const mainDiv = element.closest('.widget-container');
+
+        const apiUrl = "{% url 'widgetcounter-list' %}" + widgetId + "/";
+
+        fetch(apiUrl, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            if (response.status === 204 || response.status === 205 || response.text === '') {
+                return null; // No content to parse
+            } else {
+                return response.json(); // Parse JSON only when it is available
+            }
+        })
+        .then(data => {
+            mainDiv.remove();
+        })
+        .catch(error => {
+            // Handle errors
+            console.error('Error:', error);
+        });
+    };
+
+    function creteWidget(widget) {
+        const url = "/widgets_detail/" + widget.uuid;
+
+
+        const newDiv = document.createElement('div');
+        newDiv.setAttribute('class', 'widget-container row glass border border-3 rounded-3 mt-2');
+        newDiv.setAttribute('data-widget', widget.id);
+
+        newDiv.innerHTML = `
+
+            <div class="widget-container-left col-sm12 col-md-6 col-lg-6 border-end" data-widget-id="${widget.id}">
+                <div class="row mt-1 mb-1">
+                    <div class="col">
+                        <span class="fs-4">${widget.title}</span>
+                        <a class="btn btn-outline-info" href="${url}">Управление виджетом</a>
+                        <button class="widget-delete btn btn-danger" data-widget-id="${widget.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="row mt-1 mb-1 add-counter-block">
+                    <form class="col counter-add" data-widget-id="${widget.id}">
+                        <input name="label" type="text" class="form-control mb-1" placeholder="Имя счетчика" required>
+                        <input name="value" type="number" class="form-control mb-1" placeholder="Значение" required>
+                        <input name="default" type="number" class="form-control mb-1" placeholder="Изменение по умолчанию" required>
+                        <div class="row mx-auto">
+                            <input type="submit" class="add-counter btn btn-outline-secondary" value="Добавить счетчик" data-widget-id="{{ widget.id }}">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-sm12 col-md-6 col-lg-6">
+
+            </div>
+          `;
+
+        const mainContainer = document.getElementById('main-container');
+        mainContainer.appendChild(newDiv);
+
+        let selector = `.widget-delete.btn.btn-danger[data-widget-id="${widget.id}"]`;
+        let button = document.querySelector(selector);
+        button.addEventListener('click', deleteWidget);
+
+        selector = `.counter-add[data-widget-id="${widget.id}"]`;
+        button = document.querySelector(selector);
+        button.addEventListener('submit', function (event) {
+            event.preventDefault();
+            createCounter(event);
+        });
+
+    }
+
+    const appendCounter = function (counter) {
+        let selector = `.widget-container-left[data-widget-id="${counter.widget}"]`;
+        const elem = document.querySelector(selector);
+
+
+        const newDiv = document.createElement('div');
+
+        newDiv.setAttribute('class', 'row mt-2 mb-2 counter-container');
+        newDiv.setAttribute('data-counter-id', counter.id);
+
+        newDiv.innerHTML = `
+                <div class="col">
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="${counter.label}">
+                        <input type="text" class="form-control" value="${counter.value}">
+                        <input type="text" class="form-control" value="${counter.default_increment}">
+                        <button class="change-counter btn btn-outline-secondary input-group-btn" data-counter-id="${counter.id}">Изменить</button>
+                        <button class="delete-counter btn btn-outline-danger input-group-btn" data-counter-id="${counter.id}">Удалить</button>
+                    </div>
+                </div>`;
+
+        elem.appendChild(newDiv);
+    }
+
+    const createCounter = function(event) {
+        const element = event.currentTarget;
+        const widgetId = element.dataset.widgetId;
+        const apiUrl = "{% url 'counter-list' %}";
+
+        const formData = new FormData(event.target);
+
+        // Now find the inputs within that parent container
+        let label = formData.get('label')
+        let value = formData.get('value');
+        let defaultValue = formData.get('default');
+
+        const postData = {
+            label: formData.get('label'),
+            value: formData.get('value'),
+            default_increment: formData.get('default'),
+            widget: widgetId,
+        };
+
+        fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+          },
+          body: JSON.stringify(postData),
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+              appendCounter(data);
+          })
+          .catch(error => {
+            // Handle errors
+            console.error('Error:', error);
+          });
+
+        element.reset();
+    }
+
     window.addEventListener("load", () => {
         const form = document.getElementById("create-widget");
 
@@ -73,7 +238,6 @@
             const FD = new FormData(form);
 
             const apiUrl = 'http://127.0.0.1:8000/api/v1/widgets/';
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             const postData = {
               title: FD.get('title'),
@@ -95,8 +259,7 @@
                 return response.json();
               })
               .then(data => {
-                // Process the data from the server
-                console.log(data);
+                creteWidget(data);
               })
               .catch(error => {
                 // Handle errors
@@ -105,27 +268,15 @@
 
         });
 
-        const countersForms = document.querySelectorAll('form[data-create-counter]');
-
-        const createCounter = function(event) {
-            event.preventDefault();
-
-            const formElement = event.currentTarget;
-            const widgetId = formElement.dataset.createCounter;
-            console.log(widgetId);
-        }
-
+        const countersForms = document.querySelectorAll('.counter-add');
         countersForms.forEach(function (form) {
-            form.addEventListener('submit', createCounter);
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                createCounter(event);
+            });
         });
 
-        const deleteWidgetButtons = document.querySelectorAll('button[data-delete-widget]');
-
-        const deleteWidget = function (event) {
-            const formElement = event.currentTarget;
-            const widgetId = formElement.dataset.deleteWidget;
-            console.log(widgetId);
-        }
+        const deleteWidgetButtons = document.querySelectorAll('button.widget-delete');
 
         deleteWidgetButtons.forEach(function (button) {
             button.addEventListener('click', deleteWidget);

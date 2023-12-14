@@ -17,6 +17,10 @@ class Counter(models.Model):
     default_increment = models.IntegerField(default=1)
     widget = models.ForeignKey(WidgetCounter, related_name="counters", on_delete=models.CASCADE)
 
+    @property
+    def user(self):
+        return self.widget.user
+
     def __str__(self):
         return f"{self.label}: {self.value}"
 

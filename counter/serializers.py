@@ -3,10 +3,12 @@ from rest_framework import serializers
 from counter.models import Counter, WidgetCounter
 from uuid import uuid4
 
+
 class CounterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Counter
-        fields = ["id", "label", "value", "default_increment", "widget", ]
+        fields = ["id", "label", "value", "default_increment", "widget"]
+
 
 
 class UserSerializer(serializers.ModelSerializer):
