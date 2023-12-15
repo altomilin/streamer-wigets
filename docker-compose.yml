@@ -15,7 +15,7 @@ services:
       - db
     volumes:
     - .:/src/
-    - static_volume:/src/staticfiles
+    - static_volume:/src/static
     networks:
       - db_net
     ports:
@@ -27,7 +27,6 @@ services:
     volumes:
     - postgres_data:/var/lib/postgresql/data
     - ./logs:/var/log
-    - .:/docker-entrypoint-initdb.d
     networks:
       - db_net
     healthcheck:
@@ -44,7 +43,7 @@ services:
     build: ./nginx
     restart: unless-stopped
     volumes:
-    - static_volume:/src/staticfiles
+    - static_volume:/src/static
     networks:
       - db_net
     ports:

@@ -62,6 +62,8 @@ def register(request):
 
 
 def widgets(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     widgets_list = WidgetCounter.objects.filter(user=request.user)
     context = {
         'title': 'Виджеты',

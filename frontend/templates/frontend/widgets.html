@@ -237,7 +237,7 @@
             event.preventDefault();
             const FD = new FormData(form);
 
-            const apiUrl = 'http://127.0.0.1:8000/api/v1/widgets/';
+            const apiUrl = "{% url 'widgetcounter-list' %}";
 
             const postData = {
               title: FD.get('title'),
