@@ -96,6 +96,7 @@ def widget_detail_obs(request, widget_uuid):
     url = request.build_absolute_uri(reverse('widgetcounter-detail', args=(widget.id, )))
 
     context = {
+        'widget_id': widget.id,
         'counters': widget.counters.all(),
         'url': url,
     }
