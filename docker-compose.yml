@@ -1,8 +1,12 @@
-version: '3.9'
+version: '2'
 
 volumes:
   postgres_data:
   static_volume:
+  certs:
+  vhost:
+  html:
+  acme:
 
 networks:
   db_net:
@@ -22,6 +26,9 @@ services:
     - 8000:8000
     env_file:
       - .env
+    environment:
+      - VIRTUAL_HOST=${ALLOWED_HOST}
+      - LETSENCRYPT_HOST=${ALLOWED_HOST}
   db:
     image: postgres:15-alpine
     volumes:
@@ -44,12 +51,27 @@ services:
     restart: unless-stopped
     volumes:
     - static_volume:/src/static
+    - certs:/etc/nginx/certs
+    - vhost:/etc/nginx/vhost.d
+    - html:/usr/share/nginx/html
+    - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
       - db_net
     ports:
-    - 80:80
+    - "80:80"
+    - "443:443"
     depends_on:
       - web
+  acme_companion:
+    image: nginxproxy/acme-companion
+    container_name: app_acme_companion
+    volumes_from:
+      - nginx
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - acme:/etc/acme.sh
+
+
 
 
 
