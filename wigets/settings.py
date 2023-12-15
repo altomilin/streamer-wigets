@@ -138,6 +138,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS = ['https://widget.tomilin.pro']
 if csrf_subdomain := os.getenv('CSRF_SUBDOMAIN'):
-    CSRF_TRUSTED_ORIGINS += [f'http://{csrf_subdomain}', f'https://{csrf_subdomain}', 'https://widget.tomilin.pro']
+    CSRF_TRUSTED_ORIGINS += [f'http://{csrf_subdomain}', f'https://{csrf_subdomain}',]
