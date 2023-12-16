@@ -29,9 +29,9 @@
     {% endfor %}
     <script>
         const csrfToken = "{{ csrf_token }}";
-
+        const url = "{% url 'widgetcounter-detail' pk=widget_id %}";
         function fetchApiData() {
-          fetch('{{ url }}', {
+          fetch(url, {
               method: 'GET',
               headers: {
                 'Content-Type': 'application/json',
