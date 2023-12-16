@@ -49,9 +49,9 @@
                 <div class="row mt-2 mb-2 counter-container" data-counter-id="{{ counter.id }}">
                     <div class="col">
                         <div class="input-group">
-                            <input type="text" class="form-control" value="{{ counter.label }}">
-                            <input type="text" class="form-control" value="{{ counter.value }}">
-                            <input type="text" class="form-control" value="{{ counter.default_increment }}">
+                            <input name="label"   type="text" class="form-control" value="{{ counter.label }}">
+                            <input name="value"   type="text" class="form-control" value="{{ counter.value }}">
+                            <input name="default" type="text" class="form-control" value="{{ counter.default_increment }}">
                             <button class="change-counter btn btn-outline-secondary input-group-btn" data-counter-id="{{ counter.id }}">Изменить</button>
                             <button class="delete-counter btn btn-outline-danger input-group-btn" data-counter-id="{{ counter.id }}">Удалить</button>
                         </div>
@@ -162,6 +162,74 @@
 
     }
 
+    function addCounterButtonListener(button, action) {
+        const url = `{% url 'counter-list' %}${button.dataset.counterId}/`;
+        const parentDiv = button.closest('.input-group');
+        if (action === 'change') {
+            button.addEventListener('click', () => {
+                const label = parentDiv.querySelector('input[name="label"]').value;
+                const value = parentDiv.querySelector('input[name="value"]').value;
+                const defaultValue = parentDiv.querySelector('input[name="default"]').value;
+
+                const postData = {
+                    label: label,
+                    value: value,
+                    default_increment: defaultValue
+                }
+
+                fetch(url, {
+                  method: 'PATCH',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                  },
+                  body: JSON.stringify(postData),
+                })
+                  .then(response => {
+                    if (!response.ok) {
+                      throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                  })
+                  .then(data => {
+                      console.log(data);
+                  })
+                  .catch(error => {
+                    // Handle errors
+                    console.error('Error:', error);
+                  });
+            });
+        }
+        if (action === 'delete') {
+            button.addEventListener('click', () => {
+                fetch(url, {
+                  method: 'DELETE',
+                  headers: {
+                    'X-CSRFToken': csrfToken,
+                  }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    if (response.status === 204 || response.status === 205 || response.text === '') {
+                        return null; // No content to parse
+                    } else {
+                        return response.json(); // Parse JSON only when it is available
+                    }
+                })
+                .then(data => {
+                    parentDiv.remove();
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error('Error:', error);
+                });
+            });
+        }
+    }
+
+
     const appendCounter = function (counter) {
         let selector = `.widget-container-left[data-widget-id="${counter.widget}"]`;
         const elem = document.querySelector(selector);
@@ -175,15 +243,23 @@
         newDiv.innerHTML = `
                 <div class="col">
                     <div class="input-group">
-                        <input type="text" class="form-control" value="${counter.label}">
-                        <input type="text" class="form-control" value="${counter.value}">
-                        <input type="text" class="form-control" value="${counter.default_increment}">
+                        <input name="label"   type="text" class="form-control" value="${counter.label}">
+                        <input name="value"   type="text" class="form-control" value="${counter.value}">
+                        <input name="default" type="text" class="form-control" value="${counter.default_increment}">
                         <button class="change-counter btn btn-outline-secondary input-group-btn" data-counter-id="${counter.id}">Изменить</button>
                         <button class="delete-counter btn btn-outline-danger input-group-btn" data-counter-id="${counter.id}">Удалить</button>
                     </div>
                 </div>`;
 
         elem.appendChild(newDiv);
+
+        const changeButtonSelector = `.change-counter[data-counter-id="${counter.id}"]`;
+        const changeButton = document.querySelector(changeButtonSelector);
+        addCounterButtonListener(changeButton, 'change');
+
+        const deleteButtonSelector = `.delete-counter[data-counter-id="${counter.id}"]`;
+        const deleteButton = document.querySelector(deleteButtonSelector);
+        addCounterButtonListener(deleteButton, 'delete');
     }
 
     const createCounter = function(event) {
@@ -280,6 +356,19 @@
 
         deleteWidgetButtons.forEach(function (button) {
             button.addEventListener('click', deleteWidget);
+        });
+
+
+        const changeButtonSelector = `.change-counter[data-counter-id]`;
+        const changeButton = document.querySelectorAll(changeButtonSelector);
+        changeButton.forEach(function (button) {
+            addCounterButtonListener(button, 'change');
+        });
+
+        const deleteButtonSelector = `.delete-counter[data-counter-id]`;
+        const deleteButton = document.querySelectorAll(deleteButtonSelector);
+        deleteButton.forEach(function (button) {
+            addCounterButtonListener(button, 'delete');
         });
 
     });
