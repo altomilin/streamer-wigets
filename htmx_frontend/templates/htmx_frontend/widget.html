@@ -1,0 +1,48 @@
+    <div class="widget-container row glass border border-3 rounded-3 mt-2" data-widget="{{ widget.id }}">
+            <div class="widget-container-left col-sm12 col-md-6 col-lg-6 border-end" data-widget-id="{{ widget.id }}">
+                <div class="row mt-1 mb-1">
+                    <div class="col">
+                        <span class="fs-4">{{ widget.title }}</span>
+                        <a class="btn btn-outline-info" href="{% url 'widgets_detail' widget_uuid=widget.uuid %}">Управление виджетом</a>
+                        <button class="widget-delete btn btn-danger"
+                                data-widget-id="{{ widget.id }}"
+                                hx-delete="{% url 'widgetcounter-list' %}{{ widget.id }}/"
+                                hx-target='[data-widget="{{ widget.id }}"]'
+                                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                                hx-swap="delete"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="row mt-1 mb-1">
+                    <form class="col counter-add" data-widget-id="{{ widget.id }}">
+                        <input name="label" type="text" class="form-control mb-1" placeholder="Имя счетчика" required >
+                        <input name="value" type="number" class="form-control mb-1" placeholder="Значение" required >
+                        <input name="default_increment" type="number" class="form-control mb-1" placeholder="Изменение по умолчанию" required >
+                        <div class="row mx-auto">
+                            <button type="button"
+                                    class="add-counter btn btn-outline-secondary"
+                                    data-widget-id="{{ widget.id }}"
+                                    hx-post="{% url 'htmx_counter' %}"
+                                    hx-target='closest .widget-container-left'
+                                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                                    hx-swap="beforeend"
+                            >
+                                Добавить счетчик
+                            </button>
+                        </div>
+                        <input name="widget" type="text" class="d-none" value="{{ widget.id }}">
+
+                    </form>
+                </div>
+                {% for counter in widget.counters.all %}
+                    {% include 'htmx_frontend/counter.html' with counter=counter %}
+                {% endfor %}
+            </div>
+            <div class="col-sm12 col-md-6 col-lg-6">
+
+            </div>
+    </div>

@@ -1,0 +1,31 @@
+{% extends 'frontend/base.html' %}
+
+{% block content %}
+    <div class="container" id="main-container">
+        <div class="row border border-3 rounded-3 mt-2 glass">
+            <h1 class="h3 mt-2 mb-3">Добавление виджетов</h1>
+            <div class="col col-sm-12 col-md-6 col-lg-6">
+                <form hx-post="{% url 'create_widget' %}"
+                      hx-swap="beforeend"
+                      hx-target="#main-container"
+                      id="create-widget">
+                    {% csrf_token %}
+                    <div class="input-group mb-3">
+                        <label class="input-group-text" for="widget-name" id="widget-name-label">Имя виджета</label>
+                        <input type="text" class="form-control" id="widget-name" name="title" aria-describedby="widget-name-label">
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="submit" class="btn btn-outline-secondary" value="Добавить">
+                    </div>
+                </form>
+            </div>
+            <div class="col col-sm-12 col-md-6 col-lg-6">
+
+            </div>
+        </div>
+
+    {% for widget in widgets_list %}
+        {% include 'htmx_frontend/widget.html' with widget=widget %}
+    {% endfor %}
+    </div>
+{% endblock %}

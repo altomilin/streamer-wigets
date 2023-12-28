@@ -61,6 +61,16 @@ class WidgetCounterViewSet(ModelViewSet):
     serializer_class = WidgetCounterSerializer
     permission_classes = [IsOwnerOrReadOnly]
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            # You can customize the status code here
+            status_code = status.HTTP_200_OK if request.htmx else status.HTTP_204_NO_CONTENT
+            return Response(status=status_code)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
     @action(methods=['get'], detail=True, url_path='counter-widget')
     def get_counter_widget(self, request, *args, **kwargs):
         widget = self.get_object()

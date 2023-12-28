@@ -1,0 +1,16 @@
+                <div class="row mt-2 mb-2 counter-container" data-counter-id="{{ counter.id }}">
+                    <div class="col">
+                        <div class="input-group">
+                            <input name="label"   type="text" class="form-control" value="{{ counter.label }}">
+                            <input name="value"   type="text" class="form-control" value="{{ counter.value }}">
+                            <input name="default_increment" type="text" class="form-control" value="{{ counter.default_increment }}">
+                            <button class="change-counter btn btn-outline-secondary input-group-btn"
+                                    data-counter-id="{{ counter.id }}"
+                                    hx-post="{% url 'update_counter' pk=counter.id %}"
+                            >
+                                Изменить
+                            </button>
+                            <button class="delete-counter btn btn-outline-danger input-group-btn" data-counter-id="{{ counter.id }}">Удалить</button>
+                        </div>
+                    </div>
+                </div>
